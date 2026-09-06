@@ -1,0 +1,35 @@
+{% extends 'base.html' %}{% block title %}GitPulse · OSSentinel{% endblock %}{%
+block content %}
+<div class="shell">
+  <section class="hero">
+    <div class="eyebrow" style="color: var(--mint)">GitPulse</div>
+    <h1>Ask your repository what it knows.</h1>
+    <form method="post" action="/gitpulse/query" class="card">
+      <input
+        class="input"
+        name="repo_name"
+        value="{{repo_name or ''}}"
+        placeholder="owner/repository"
+        required
+      /><textarea
+        class="textarea"
+        name="question"
+        placeholder="Is our repo healthy?"
+        required
+      ></textarea
+      ><button class="button">Ask GitPulse</button>
+    </form>
+  </section>
+  {% if result %}
+  <div class="card">
+    <div class="eyebrow">Answer</div>
+    <h2>{{result.answer}}</h2>
+    {% if result.chart_type != 'none' %}<canvas id="pulse-chart"></canvas>
+    <script>
+      renderChart('pulse-chart','{{result.chart_type}}',{{result.chart_labels|tojson}},{{result.chart_data|tojson}},'{{result.chart_title}}')
+    </script>
+    {% endif %}
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

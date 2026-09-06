@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>{% block title %}OSSentinel AI{% endblock %}</title>
+    <link rel="stylesheet" href="/static/css/app.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  </head>
+  <body>
+    <header class="nav">
+      <div class="nav-inner">
+        <a class="brand" href="/dashboard">🤖 OSSentinel <b>AI</b></a>
+        <nav class="nav-links">
+          <a href="/dashboard">Dashboard</a><a href="/repos">Repos</a
+          ><a href="/triage">Triage</a><a href="/prism">PRism</a
+          ><a href="/gitpulse">GitPulse</a><a href="/reports">Reports</a>
+        </nav>
+        {% if request.session.get('github_username') %}<span class="muted"
+          >{{request.session.get('github_username')}}</span
+        ><a class="button ghost" href="/logout">Logout</a>{% else %}<a
+          class="button"
+          href="/login"
+          >Login</a
+        >{% endif %}
+      </div>
+    </header>
+    <main>{% block content %}{% endblock %}</main>
+    <div id="toast" hidden></div>
+    <footer class="footer">
+      <div class="shell">
+        OSSentinel AI Platform · MIT License · Built by Cognitive Hackers ·
+        <a href="/pricing">Pricing</a> · <a href="/docs">Docs</a>
+      </div>
+    </footer>
+    <script src="/static/js/app.js"></script>
+  </body>
+</html>

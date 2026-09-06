@@ -1,0 +1,33 @@
+{% extends 'base.html' %}{% block title %}Pricing · OSSentinel{% endblock %}{%
+block content %}
+<div class="shell">
+  <section class="hero">
+    <div class="eyebrow">Simple pricing</div>
+    <h1>More signal. Less maintenance drag.</h1>
+    <div class="grid">
+      <div class="card">
+        <h2>Free</h2>
+        <div class="stat">$0</div>
+        <p class="muted">1 repo, 100 triage actions, 10 reviews, 5 queries.</p>
+        <a class="button" href="/demo">Start free</a>
+      </div>
+      <div class="card">
+        <h2>Pro</h2>
+        <div class="stat">$15</div>
+        <p class="muted">
+          Per repository monthly. Unlimited automation, Slack, API access.
+        </p>
+        <a class="button secondary" href="/auth/github">Choose Pro</a>
+      </div>
+      <div class="card">
+        <h2>Enterprise</h2>
+        <div class="stat">$500</div>
+        <p class="muted">
+          Unlimited repos, SSO, self-hosting, SLA, and support.
+        </p>
+        <a class="button ghost" href="mailto:hello@ossentinel.ai">Talk to us</a>
+      </div>
+    </div>
+  </section>
+</div>
+{% endblock %}

@@ -1,0 +1,39 @@
+{% extends 'base.html' %}{% block title %}Triage · OSSentinel{% endblock %}{%
+block content %}
+<div class="shell">
+  <section class="hero">
+    <div class="eyebrow">OSSentinel Core</div>
+    <h1>Issue triage, without the queue anxiety.</h1>
+    <p>
+      Every issue gets a label, priority score, duplicate check, and a
+      human-sounding first reply.
+    </p>
+  </section>
+  <div class="card">
+    <table class="table">
+      <tr>
+        <th>Issue</th>
+        <th>Title</th>
+        <th>Label</th>
+        <th>Priority</th>
+        <th>Status</th>
+      </tr>
+      {% for row in rows %}
+      <tr>
+        <td>#{{row.issue_number}}</td>
+        <td>{{row.issue_title}}</td>
+        <td><span class="pill">{{row.label}}</span></td>
+        <td>{{row.priority_level}} · {{row.priority_score}}</td>
+        <td>{{row.status}}</td>
+      </tr>
+      {% else %}
+      <tr>
+        <td colspan="5" class="muted">
+          No triage activity yet. Connect a webhook to begin.
+        </td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+</div>
+{% endblock %}

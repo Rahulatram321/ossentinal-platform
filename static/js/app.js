@@ -1,0 +1,3 @@
+function showToast(message,type='success'){const toast=document.querySelector('#toast');if(!toast)return;toast.textContent=message;toast.dataset.type=type;toast.hidden=false;setTimeout(()=>toast.hidden=true,4000)}
+window.renderChart=function(id,type,labels,data,title){const canvas=document.getElementById(id);if(!canvas||!window.Chart)return;new Chart(canvas,{type,data:{labels,datasets:[{label:title,data,backgroundColor:['#00b4d8','#8b5cf6','#02c39a','#f2cc60']}]},options:{responsive:true,plugins:{legend:{display:false}}}})};
+document.addEventListener('submit',event=>{const button=event.target.querySelector('button[type=submit]');if(button){button.disabled=true;button.textContent='Working...'}});

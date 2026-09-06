@@ -1,0 +1,24 @@
+{% extends 'base.html' %}{% block title %}Settings · OSSentinel{% endblock %}{%
+block content %}
+<div class="shell">
+  <section class="hero">
+    <div class="eyebrow">Workspace settings</div>
+    <h1>Make the automation yours.</h1>
+    <form method="post" action="/settings" class="card">
+      <h2>Notifications</h2>
+      <label>Slack webhook</label
+      ><input
+        class="input"
+        name="slack_webhook"
+        placeholder="https://hooks.slack.com/..."
+      /><label>Digest email</label
+      ><input
+        class="input"
+        name="email"
+        type="email"
+        placeholder="maintainer@example.com"
+      /><button class="button">Save settings</button>
+    </form>
+  </section>
+</div>
+{% endblock %}

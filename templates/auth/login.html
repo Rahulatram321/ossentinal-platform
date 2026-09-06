@@ -1,0 +1,17 @@
+{% extends 'base.html' %}{% block title %}Login · OSSentinel{% endblock %}{%
+block content %}
+<div class="shell">
+  <div
+    class="card"
+    style="max-width: 520px; margin: 6rem auto; text-align: center"
+  >
+    <div class="eyebrow">Welcome back</div>
+    <h1>Bring your maintainer brain online.</h1>
+    <p class="muted">Connect GitHub to start watching your repositories.</p>
+    <a class="button" href="/auth/github">Continue with GitHub</a>{% if
+    request.session.get('csrf_token') %}
+    <p><a class="muted" href="/demo">Use demo mode</a></p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

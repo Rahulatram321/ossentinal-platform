@@ -1,0 +1,17 @@
+fastapi==0.111.0
+uvicorn[standard]==0.29.0
+jinja2==3.1.4
+python-dotenv==1.0.1
+pydantic-settings==2.2.1
+google-generativeai==0.7.2
+PyGithub==2.3.0
+authlib==1.3.1
+httpx==0.27.0
+python-multipart==0.0.9
+starlette==0.37.2
+aiofiles==23.2.1
+itsdangerous==2.2.0
+sqlalchemy==2.0.30
+numpy==1.26.4
+pytest==8.3.3
+pytest-asyncio==0.23.0

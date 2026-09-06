@@ -1,0 +1,75 @@
+{% extends 'base.html' %}{% block title %}Dashboard · OSSentinel{% endblock %}{%
+block content %}
+<div class="shell">
+  <section class="hero">
+    <div class="eyebrow">Control room</div>
+    <h1>Your repositories are being watched by AI.</h1>
+    <p>
+      Three quiet agents are turning maintainer noise into clear next actions.
+    </p>
+    <div class="actions">
+      <a class="button" href="/repos">Connect a repository</a
+      ><a class="button ghost" href="/triage">Review triage</a>
+    </div>
+  </section>
+  <div class="grid">
+    <div class="card">
+      <div class="eyebrow">Issues triaged</div>
+      <div class="stat">{{stats.triaged}}</div>
+    </div>
+    <div class="card">
+      <div class="eyebrow" style="color: var(--purple)">PRs reviewed</div>
+      <div class="stat">{{stats.reviewed}}</div>
+    </div>
+    <div class="card">
+      <div class="eyebrow" style="color: var(--mint)">Queries answered</div>
+      <div class="stat">{{stats.queries}}</div>
+    </div>
+    <div class="card">
+      <div class="eyebrow" style="color: #f2cc60">Health score</div>
+      <div class="stat">{{stats.health_score}}%</div>
+    </div>
+  </div>
+  <h2>Connected repositories</h2>
+  <div class="grid">
+    {% for repo in repos %}
+    <div class="card">
+      <h3>{{repo.full_name}}</h3>
+      <span class="pill">{{repo.webhook_status}}</span>
+      <p class="muted">
+        {{repo.total_triaged}} triaged · {{repo.total_reviewed}} reviewed
+      </p>
+    </div>
+    {% else %}
+    <div class="card">
+      <h3>Your first repo is waiting.</h3>
+      <p class="muted">
+        Connect a GitHub repository to turn on issue and pull request
+        intelligence.
+      </p>
+    </div>
+    {% endfor %}
+  </div>
+  <h2>Recent activity</h2>
+  <div class="card">
+    <table class="table">
+      <tr>
+        <th>Module</th>
+        <th>Action</th>
+        <th>Repository</th>
+      </tr>
+      {% for log in logs %}
+      <tr>
+        <td><span class="pill">{{log.module}}</span></td>
+        <td>{{log.action}}</td>
+        <td>{{log.repo}}</td>
+      </tr>
+      {% else %}
+      <tr>
+        <td colspan="3" class="muted">No activity yet.</td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+</div>
+{% endblock %}
