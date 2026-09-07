@@ -1,0 +1,4 @@
+Review this pull-request diff. Return JSON only with quality_score (0-100), bug_risks (array), summary, suggested_reviewer, and improvement_tips (array).
+
+DIFF:
+{diff}

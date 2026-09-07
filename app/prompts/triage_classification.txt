@@ -1,0 +1,1 @@
+Classify this GitHub issue as exactly one of these three words: bug, feature, question. Title: {title}. Body: {body}. Reply with only the single classification word.

@@ -4,6 +4,7 @@ import time
 import httpx
 from core.config import settings
 from agents.fallbacks import prism_fallback
+from utils.prompts import render_prompt
 
 
 def parse_pr_url(url: str) -> tuple[str, str, int]:
@@ -30,7 +31,7 @@ def analyze_diff_with_gemini(diff: str) -> dict:
     truncated = diff[:8000]
     if not settings.gemini_api_key:
         return prism_fallback(truncated)
-    prompt = """Review this pull-request diff. Return JSON only with quality_score (0-100), bug_risks (array), summary, suggested_reviewer, and improvement_tips (array).\n\nDIFF:\n""" + truncated
+    prompt = render_prompt("prism_review.txt", diff=truncated)
     for attempt in range(3):
         try:
             import google.generativeai as genai

@@ -3,6 +3,7 @@ from agents.priority import calculate_priority_score
 from core.config import settings
 from core.database import SessionLocal, TriageLog
 from utils.logger import log_action
+from utils.prompts import render_prompt
 import httpx
 
 
@@ -17,11 +18,8 @@ def _gemini(prompt: str) -> str:
         return ""
 
 
-CLASSIFICATION_PROMPT = """You are OSSentinel, an expert open-source issue triager. Classify the GitHub issue below as exactly one label: bug, feature, or question. Reply with only that lowercase label.\n\nTitle: {title}\nBody: {body}"""
-
-
 def classify_issue(title: str, body: str) -> str:
-    response = _gemini(CLASSIFICATION_PROMPT.format(title=title, body=body[:4000])).lower()
+    response = _gemini(render_prompt("triage_classification.txt", title=title, body=body[:500])).lower()
     if response in {"bug", "feature", "question"}:
         return response
     text = f"{title} {body}".lower()

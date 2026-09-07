@@ -1,0 +1,8 @@
+Use this repository context to answer the question. Use exactly this format:
+CHART_TYPE: bar|line|pie|none
+CHART_LABELS: label1|label2
+CHART_DATA: 1|2
+ANSWER: concise answer
+
+CONTEXT: {context}
+QUESTION: {question}
