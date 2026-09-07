@@ -1,6 +1,7 @@
 import re
 from core.config import settings
 from agents.fallbacks import gitpulse_fallback
+from utils.prompts import render_prompt
 
 
 def fetch_repo_data(repo_name: str, token: str = "") -> str:
@@ -10,7 +11,7 @@ def fetch_repo_data(repo_name: str, token: str = "") -> str:
 def query_gemini(question: str, context: str) -> dict:
     if not settings.gemini_api_key:
         return gitpulse_fallback(question)
-    prompt = f"""Use this repository context to answer the question. Use exactly this format:\nCHART_TYPE: bar|line|pie|none\nCHART_LABELS: label1|label2\nCHART_DATA: 1|2\nANSWER: concise answer\n\nCONTEXT: {context[:6000]}\nQUESTION: {question}"""
+    prompt = render_prompt("gitpulse_query.txt", context=context[:6000], question=question)
     try:
         import google.generativeai as genai
         genai.configure(api_key=settings.gemini_api_key)
