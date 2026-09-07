@@ -5,6 +5,7 @@ block content %}
     <div class="eyebrow" style="color: var(--mint)">GitPulse</div>
     <h1>Ask your repository what it knows.</h1>
     <form method="post" action="/gitpulse/query" class="card">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
       <input
         class="input"
         name="repo_name"
@@ -19,6 +20,7 @@ block content %}
       ></textarea
       ><button class="button">Ask GitPulse</button>
     </form>
+    <div class="query-chips" aria-label="Example questions"><button type="button">Is our repo healthy?</button><button type="button">Who contributes most?</button><button type="button">What is trending?</button><button type="button">Where are bug clusters?</button><button type="button">Which features are requested?</button></div>
   </section>
   {% if result %}
   <div class="card">

@@ -11,7 +11,8 @@
     <header class="nav">
       <div class="nav-inner">
         <a class="brand" href="/dashboard">🤖 OSSentinel <b>AI</b></a>
-        <nav class="nav-links">
+        <button class="nav-toggle" type="button" aria-label="Toggle navigation" aria-expanded="false">☰</button>
+        <nav class="nav-links" id="primary-navigation">
           <a href="/dashboard">Dashboard</a><a href="/repos">Repos</a
           ><a href="/triage">Triage</a><a href="/prism">PRism</a
           ><a href="/gitpulse">GitPulse</a><a href="/reports">Reports</a>
@@ -34,5 +35,6 @@
       </div>
     </footer>
     <script src="/static/js/app.js"></script>
+    <script>window.setInterval(async()=>{try{const r=await fetch('/api/v1/stats');if(r.ok)window.dispatchEvent(new CustomEvent('ossentinel:stats',{detail:await r.json()}));}catch(_){ }},30000);</script>
   </body>
 </html>

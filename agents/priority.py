@@ -15,3 +15,7 @@ def calculate_priority(label: str, text: str, age_days: int = 0, duplicate_simil
     score = max(0, min(100, int(score)))
     level = "Urgent" if score >= 80 else "High" if score >= 60 else "Normal" if score >= 40 else "Low"
     return {"score": score, "level": level}
+
+
+# Explicit name used by the triage pipeline and integrations.
+calculate_priority_score = calculate_priority

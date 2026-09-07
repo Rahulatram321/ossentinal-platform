@@ -5,6 +5,7 @@ block content %}
     <div class="eyebrow">Workspace settings</div>
     <h1>Make the automation yours.</h1>
     <form method="post" action="/settings" class="card">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
       <h2>Notifications</h2>
       <label>Slack webhook</label
       ><input

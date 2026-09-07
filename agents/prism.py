@@ -1,6 +1,8 @@
 import json
 import re
+import time
 import httpx
+from core.config import settings
 from agents.fallbacks import prism_fallback
 
 
@@ -20,11 +22,29 @@ def fetch_pr_diff(url: str, token: str = "") -> str:
             response.raise_for_status(); return response.text[:8000]
         except Exception:
             if attempt == 2: return ""
+            time.sleep(0.5 * (2 ** attempt))
     return ""
 
 
 def analyze_diff_with_gemini(diff: str) -> dict:
-    return prism_fallback(diff)
+    truncated = diff[:8000]
+    if not settings.gemini_api_key:
+        return prism_fallback(truncated)
+    prompt = """Review this pull-request diff. Return JSON only with quality_score (0-100), bug_risks (array), summary, suggested_reviewer, and improvement_tips (array).\n\nDIFF:\n""" + truncated
+    for attempt in range(3):
+        try:
+            import google.generativeai as genai
+            genai.configure(api_key=settings.gemini_api_key)
+            text = genai.GenerativeModel("gemini-1.5-flash").generate_content(prompt).text.strip()
+            text = re.sub(r"^```(?:json)?\s*|\s*```$", "", text, flags=re.I)
+            data = json.loads(text)
+            return {"quality_score": max(0, min(100, int(data.get("quality_score", 0)))), "bug_risks": list(data.get("bug_risks", [])),
+                    "summary": str(data.get("summary", "")), "suggested_reviewer": str(data.get("suggested_reviewer", "")),
+                    "improvement_tips": list(data.get("improvement_tips", [])), "offline_mode": False}
+        except Exception:
+            if attempt < 2:
+                time.sleep(0.5 * (2 ** attempt))
+    return prism_fallback(truncated)
 
 
 def review_pr(url: str, token: str = "") -> dict:

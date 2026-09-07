@@ -30,6 +30,9 @@ block content %}
       <div class="stat">{{stats.health_score}}%</div>
     </div>
   </div>
+  <h2>Activity trend</h2>
+  <div class="card"><canvas id="weekly-trend"></canvas></div>
+  <script>renderChart('weekly-trend', 'line', ['6d','5d','4d','3d','2d','Yesterday','Today'], {{ weekly_trend|tojson }}, 'Actions')</script>
   <h2>Connected repositories</h2>
   <div class="grid">
     {% for repo in repos %}

@@ -5,6 +5,7 @@ from agents.prism import review_pr
 from agents.triage import process_issue
 from core.database import SessionLocal, TriageLog, PRReview, GitPulseQuery, get_user_stats
 from core.security import get_session_token, is_authenticated
+from utils.logger import get_weekly_trend
 router = APIRouter(prefix="/api/v1")
 
 class TriageRequest(BaseModel): repo: str; issue_number: int; title: str; body: str = ""
@@ -16,7 +17,11 @@ def auth(request): return is_authenticated(request)
 def api_health(): return {"status": "ok", "modules": {"triage": True, "prism": True, "gitpulse": True}}
 
 @router.get("/stats")
-def stats(request: Request): return get_user_stats(request.session.get("github_id", "demo")) if auth(request) else JSONResponse({"detail": "unauthorized"}, 401)
+def stats(request: Request):
+    if not auth(request): return JSONResponse({"detail": "unauthorized"}, 401)
+    data = get_user_stats(request.session.get("github_id", "demo"))
+    data["weekly_trend"] = get_weekly_trend(request.session.get("github_username"))
+    return data
 
 @router.get("/repos")
 def repo_list(request: Request):

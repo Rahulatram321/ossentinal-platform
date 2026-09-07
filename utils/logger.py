@@ -1,4 +1,5 @@
 import json
+from datetime import datetime, timedelta
 from pathlib import Path
 from core.database import log_activity, SessionLocal, ActivityLog
 from sqlalchemy import func, select
@@ -28,4 +29,21 @@ def get_stats() -> dict:
     finally: db.close()
 
 
-def get_weekly_trend() -> list[int]: return [0, 0, 0, 0, 0, 0, 0]
+def get_weekly_trend(username: str | None = None) -> list[int]:
+    """Return counts oldest-to-newest for the last seven calendar days."""
+    db = SessionLocal()
+    try:
+        today = datetime.utcnow().date()
+        result = []
+        for offset in range(6, -1, -1):
+            day = today - timedelta(days=offset)
+            statement = select(func.count(ActivityLog.id)).where(
+                ActivityLog.created_at >= datetime.combine(day, datetime.min.time()),
+                ActivityLog.created_at < datetime.combine(day + timedelta(days=1), datetime.min.time()),
+            )
+            if username:
+                statement = statement.where(ActivityLog.github_username == username)
+            result.append(db.scalar(statement) or 0)
+        return result
+    finally:
+        db.close()

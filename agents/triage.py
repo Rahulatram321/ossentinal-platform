@@ -1,6 +1,9 @@
 from agents.duplicate import find_duplicate
-from agents.priority import calculate_priority
+from agents.priority import calculate_priority_score
 from core.config import settings
+from core.database import SessionLocal, TriageLog
+from utils.logger import log_action
+import httpx
 
 
 def _gemini(prompt: str) -> str:
@@ -14,8 +17,11 @@ def _gemini(prompt: str) -> str:
         return ""
 
 
+CLASSIFICATION_PROMPT = """You are OSSentinel, an expert open-source issue triager. Classify the GitHub issue below as exactly one label: bug, feature, or question. Reply with only that lowercase label.\n\nTitle: {title}\nBody: {body}"""
+
+
 def classify_issue(title: str, body: str) -> str:
-    response = _gemini(f"Classify this GitHub issue as exactly one of these three words: bug, feature, question. Title: {title}. Body: {body[:500]}. Reply with only the single classification word.")
+    response = _gemini(CLASSIFICATION_PROMPT.format(title=title, body=body[:4000])).lower()
     if response in {"bug", "feature", "question"}:
         return response
     text = f"{title} {body}".lower()
@@ -43,9 +49,46 @@ def generate_reply(label: str, title: str, dup_info: dict) -> str:
     return f"Thanks for opening this {label} issue about {title}. We appreciate the detail and will review it shortly; any additional reproduction steps or context would help."
 
 
+def apply_github_actions(repo_name: str, issue_number: int, label: str, reply: str, token: str) -> bool:
+    """Create/apply the label and publish the draft when a GitHub token is supplied."""
+    if not token:
+        return False
+    headers = {"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}"}
+    color = {"bug": "d73a4a", "feature": "0075ca", "question": "e4e669"}[label]
+    base = f"https://api.github.com/repos/{repo_name}"
+    try:
+        # Creating an existing label returns 422, which is safe to ignore.
+        httpx.post(f"{base}/labels", headers=headers, json={"name": label, "color": color}, timeout=10)
+        labels = httpx.post(f"{base}/issues/{issue_number}/labels", headers=headers, json={"labels": [label]}, timeout=10)
+        comment = httpx.post(f"{base}/issues/{issue_number}/comments", headers=headers, json={"body": reply}, timeout=10)
+        return labels.is_success and comment.is_success
+    except httpx.HTTPError:
+        return False
+
+
 def process_issue(repo_name: str, issue_number: int, title: str, body: str, token: str = "", open_issues=()) -> dict:
+    """Run the seven-step offline-safe triage workflow for one issue."""
+    # 1: classify, 2: find a duplicate, 3: score, 4: draft a reply.
     label = classify_issue(title, body)
     duplicate = find_duplicate(f"{title} {body}", open_issues)
-    priority = calculate_priority(label, f"{title} {body}", duplicate_similarity=duplicate["similarity"])
+    priority = calculate_priority_score(label, f"{title} {body}", duplicate_similarity=duplicate["similarity"])
     reply = generate_reply(label, title, duplicate)
-    return {"repo": repo_name, "issue_number": issue_number, "label": label, "duplicate": duplicate, "priority": priority, "reply": reply, "confidence": 0.86}
+    result = {"repo": repo_name, "issue_number": issue_number, "label": label, "duplicate": duplicate, "priority": priority, "reply": reply, "confidence": 0.86}
+    # 5: apply GitHub label/comment, 6: persist the result, 7: log activity.
+    result["github_applied"] = apply_github_actions(repo_name, issue_number, label, reply, token)
+    try:
+        db = SessionLocal()
+        try:
+            db.add(TriageLog(repo_full_name=repo_name, issue_number=issue_number, issue_title=title[:500], label=label,
+                priority_score=priority["score"], priority_level=priority["level"], duplicate_warning=duplicate["is_duplicate"],
+                ai_reply_preview=reply[:200], status="ready_to_apply"))
+            db.commit()
+        finally:
+            db.close()
+        log_action({"module": "triage", "action": f"Triaged issue #{issue_number}", "username": "webhook", "repo": repo_name, "metadata": result})
+        result["persisted"] = True
+    except Exception:
+        # Classification remains useful even when a transient database failure occurs.
+        result["persisted"] = False
+    result["steps_completed"] = 7
+    return result

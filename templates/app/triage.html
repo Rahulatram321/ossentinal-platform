@@ -9,6 +9,7 @@ block content %}
       human-sounding first reply.
     </p>
   </section>
+  <div class="query-chips triage-filters" aria-label="Priority filters"><button type="button" data-filter="All">All</button><button type="button" data-filter="Urgent">Urgent</button><button type="button" data-filter="High">High</button><button type="button" data-filter="Normal">Normal</button><button type="button" data-filter="Low">Low</button></div>
   <div class="card">
     <table class="table">
       <tr>
@@ -19,7 +20,7 @@ block content %}
         <th>Status</th>
       </tr>
       {% for row in rows %}
-      <tr>
+      <tr data-priority="{{row.priority_level}}">
         <td>#{{row.issue_number}}</td>
         <td>{{row.issue_title}}</td>
         <td><span class="pill">{{row.label}}</span></td>

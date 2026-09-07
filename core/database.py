@@ -147,3 +147,19 @@ def log_activity(module: str, action: str, username: str, repo: str = "", metada
     finally:
         if db is None:
             session.close()
+
+
+def seed_demo_data() -> None:
+    """Create a small, useful first-run activity trail without duplicating it."""
+    db = SessionLocal()
+    try:
+        if db.scalar(select(func.count(ActivityLog.id))) or 0:
+            return
+        db.add_all([
+            ActivityLog(github_username="demo", module="triage", action="Demo workspace initialized", repo_full_name="demo/ossentinel"),
+            ActivityLog(github_username="demo", module="prism", action="Ready to review pull requests", repo_full_name="demo/ossentinel"),
+            ActivityLog(github_username="demo", module="gitpulse", action="Ready for repository questions", repo_full_name="demo/ossentinel"),
+        ])
+        db.commit()
+    finally:
+        db.close()
